@@ -5,6 +5,17 @@ public class GamePiece {
 
     private Polygon triangle = new Polygon();
     private String player;
+    private int clickCount = 0;
+
+
+    public void addListener() {
+        // On mouse click, code within here will be run.
+        this.triangle.setOnMouseClicked(mouseEvent -> {
+            // Read from another property to toggle
+            this.triangle.setFill(Color.RED);
+            this.clickCount = 1;
+        });
+    }
 
     public GamePiece(double offsetx, double offsety, String player) {
         // Change triangle shape depending on whose piece it is
@@ -27,7 +38,7 @@ public class GamePiece {
         this.triangle.getPoints().addAll(startingCoordinates);
 
         if(player.equals("Human")) {
-            triangle.setFill(null);
+            triangle.setFill(Color.WHITE);
             triangle.setStroke(Color.BLACK);
         }
 

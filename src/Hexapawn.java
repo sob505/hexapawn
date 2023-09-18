@@ -9,9 +9,9 @@
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 import javafx.application.Application;
 
@@ -26,6 +26,7 @@ public class Hexapawn extends Application {
     public void start(Stage stage) throws Exception {
         stage.setTitle("Game Board");
 
+        // Create the board and pieces
         Pane board = gameBoard(canvas);
         Pane pieces = makePieces();
 
@@ -61,11 +62,17 @@ public class Hexapawn extends Application {
 
     private Pane makePieces() {
         GamePiece HER1 = new GamePiece(125.0,125.0, "HER");
+        HER1.addListener();
         GamePiece HER2 = new GamePiece(225.0,125.0, "HER");
+        HER2.addListener();
         GamePiece HER3 = new GamePiece(325.0,125.0, "HER");
+        HER3.addListener();
         GamePiece Human1 = new GamePiece(125.0,325.0, "Human");
+        Human1.addListener();
         GamePiece Human2 = new GamePiece(225.0,325.0, "Human");
+        Human2.addListener();
         GamePiece Human3 = new GamePiece(325.0,325.0, "Human");
+        Human3.addListener();
 
         Pane pane = new Pane();
         pane.getChildren().addAll(HER1.getPiece(),HER2.getPiece(),HER3.getPiece(),
