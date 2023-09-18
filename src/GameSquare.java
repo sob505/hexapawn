@@ -3,7 +3,7 @@ import javafx.scene.shape.Rectangle;
 
 public class GameSquare {
     private String playerPiece = "";
-    private Rectangle square;
+    private final Rectangle square;
 
     public GameSquare(double x, double y) {
         this.square = new Rectangle(x,y,100,100);

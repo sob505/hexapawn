@@ -11,6 +11,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 import javafx.application.Application;
 
@@ -25,12 +26,13 @@ public class Hexapawn extends Application {
     public void start(Stage stage) throws Exception {
         stage.setTitle("Game Board");
 
-        Pane pane = gameBoard(stage,canvas,gc);
-
+        Pane board = gameBoard(canvas);
+        Pane pieces = makePieces();
 
         // Create a StackPane to overlay the Pane
         StackPane stackPane = new StackPane();
-        stackPane.getChildren().add(pane);
+        stackPane.getChildren().add(board);
+        stackPane.getChildren().add(pieces);
 
         // Create a scene
         Scene scene = new Scene(stackPane, 800, 600);
@@ -40,7 +42,7 @@ public class Hexapawn extends Application {
 
     }
 
-    private Pane gameBoard(Stage stage, Canvas canvas, GraphicsContext gc) {
+    private Pane gameBoard(Canvas canvas) {
         GameSquare r1 = new GameSquare(100,100);
         GameSquare r2 = new GameSquare(200,100);
         GameSquare r3 = new GameSquare(300,100);
@@ -57,4 +59,17 @@ public class Hexapawn extends Application {
         return pane;
     }
 
+    private Pane makePieces() {
+        GamePiece HER1 = new GamePiece(125.0,125.0, "HER");
+        GamePiece HER2 = new GamePiece(225.0,125.0, "HER");
+        GamePiece HER3 = new GamePiece(325.0,125.0, "HER");
+        GamePiece Human1 = new GamePiece(125.0,325.0, "Human");
+        GamePiece Human2 = new GamePiece(225.0,325.0, "Human");
+        GamePiece Human3 = new GamePiece(325.0,325.0, "Human");
+
+        Pane pane = new Pane();
+        pane.getChildren().addAll(HER1.getPiece(),HER2.getPiece(),HER3.getPiece(),
+                Human1.getPiece(),Human2.getPiece(),Human3.getPiece());
+        return pane;
+    }
 }
