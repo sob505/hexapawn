@@ -1,6 +1,5 @@
 out
-.idea
-Hexapawn.iml
+.idea/
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
