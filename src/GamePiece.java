@@ -1,9 +1,9 @@
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 public class GamePiece {
-    private Double[] startingCoordinates;
+    private final Double[] startingCoordinates;
 
-    private Polygon triangle = new Polygon();
+    private final Polygon triangle = new Polygon();
     private String player;
     private int clickCount = 0;
 
