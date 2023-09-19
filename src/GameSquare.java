@@ -4,6 +4,7 @@ import javafx.scene.shape.Rectangle;
 public class GameSquare {
     private String playerPiece = "";
     private final Rectangle square;
+    private boolean clicked = false;
 
     public GameSquare(double x, double y) {
         this.square = new Rectangle(x,y,100,100);
@@ -23,4 +24,5 @@ public class GameSquare {
         return playerPiece;
     }
 
+    public boolean getClicked() { return this.clicked; }
 }
