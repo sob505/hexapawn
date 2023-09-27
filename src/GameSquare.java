@@ -4,16 +4,15 @@ import javafx.scene.shape.Rectangle;
 public class GameSquare {
     private String playerPiece = "";
     private final Rectangle square;
-    private boolean clicked = false;
 
     public GameSquare(double x, double y) {
         this.square = new Rectangle(x,y,100,100);
-        square.setFill(null);
-        square.setStroke(Color.BLACK);
+        this.square.setFill(Color.WHITE);
+        this.square.setStroke(Color.BLACK);
     }
 
     Rectangle getSquare() {
-        return square;
+        return this.square;
     }
 
     private void setPlayerPiece(String player) {
@@ -23,6 +22,4 @@ public class GameSquare {
     private String checkSquare() {
         return playerPiece;
     }
-
-    public boolean getClicked() { return this.clicked; }
 }

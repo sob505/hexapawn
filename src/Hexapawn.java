@@ -9,11 +9,12 @@
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -22,18 +23,24 @@ import javafx.application.Application;
 public class Hexapawn extends Application {
     private final Canvas canvas = new Canvas(800,500);
     private final GraphicsContext gc = canvas.getGraphicsContext2D();
+    private final Board gameBoard = new Board();
+    private Number gameMode;
+    private static Pane pane = new Pane();
+
     public static void main(String[] args) {
         launch(args);
     }
-    private final Board gameBoard = new Board();
-    private Number gameMode;
     @Override
     public void start(Stage stage) throws Exception {
         stage.setTitle("Game Board");
 
         // Create the board and pieces
-        Pane board = gameBoard.makeBoard(canvas);
-        Pane pieces = gameBoard.makePieces();
+        GridPane board = gameBoard.makeBoard(pane);
+        Group pieces = gameBoard.makePieces(pane);
+        pane.getChildren().addAll(canvas,board,pieces);
+        board.setTranslateX(100);
+        board.setTranslateY(100);
+       // Pane pieces = gameBoard.makePieces();
 
         ChoiceBox cb = new ChoiceBox(FXCollections.observableArrayList(
                 "Slow Mode", "Fast Mode", "Auto Mode")
@@ -48,7 +55,7 @@ public class Hexapawn extends Application {
 
         // Create a StackPane to overlay the Pane
         StackPane stackPane = new StackPane();
-        stackPane.getChildren().addAll(board,pieces,cb);
+        stackPane.getChildren().addAll(pane,cb);
 
         // Create a scene
         Scene scene = new Scene(stackPane, 800, 600);

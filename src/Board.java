@@ -1,66 +1,86 @@
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
+
+import java.util.List;
 
 public class Board {
     private int numRows = 3;
-    public GameSquare[][] board = new GameSquare[numRows][numRows];
+    private final GameSquare[][] board = new GameSquare[numRows][numRows];
     public int[][] pieceLocation = new int[numRows][numRows];
     public GamePiece[][] pieces = new GamePiece[2][numRows];
-    private double squareMargin = 25.0;
+    private final double squareMargin = 25.0;
+    private GridPane gridPane = new GridPane();
+    private int clickedPiece = -1;
+    private boolean firstClick = false;
 
-    public Pane makeBoard(Canvas canvas) {
-        Pane pane = new Pane();
-        pane.getChildren().addAll(canvas);
+    public GridPane makeBoard(Pane pane) {
         int startx = 100;
         int starty = 100;
 
         for(int i = 0; i < numRows; i++) {
             for(int j = 0; j < numRows; j++) {
-                this.board[i][j] = new GameSquare(startx,starty);
+               // board[i][j] = new GameSquare(startx,starty);
+                Rectangle square = new Rectangle(startx,starty,100,100);
+                square.setFill(Color.WHITE);
+                square.setStroke(Color.BLACK);
+                gridPane.add(square,i,j);
                 if(startx == 300) {
                     startx = 100;
                     starty += 100;
                 } else {
                     startx += 100;
                 }
-                addListener(this.board[i][j]);
-                pane.getChildren().addAll(this.board[i][j].getSquare());
+
+                // Add click event handler for squares
+               /* square.setOnMouseClicked(event -> {
+                    square.setFill(Color.BLUE);
+                }); */
+                addListener(square,pane);//board[i][j]);
+                //pane.getChildren().add(square);//this.board[i][j].getSquare());
             }
         }
-        return pane;
+        return gridPane;
     }
 
     /*
         Create 6 pieces on the board: 3 for HER and 3 for the human player.
      */
-    public Pane makePieces() {
+    public Group makePieces(Pane pane) {
+        Group groupPieces = new Group();
         double humanCoordinate = 125.0;
+
         // Create the computer's and the player's pieces
-        Pane pane = new Pane();
         for(int i = 0; i < numRows; i++) {
             pieces[0][i] = new GamePiece(humanCoordinate,125.0,"HER");
             pieces[1][i] = new GamePiece(humanCoordinate,325.0,"Human");
             humanCoordinate += 100;
             addListener(pieces[1][i]);
             pieceLocation[numRows-1][i] = 1;
-            pane.getChildren().addAll(pieces[0][i].getPiece(),pieces[1][i].getPiece());
+            groupPieces.getChildren().addAll(pieces[0][i].getPiece(),pieces[1][i].getPiece());
         }
-        return pane;
+
+        return groupPieces;
     }
 
     public void addListener(GamePiece piece) {
         // Take action when a piece is clicked
         piece.getPiece().setOnMouseClicked(mouseEvent -> {
-            int index = findClickedPiece();
-            // If a piece is already clicked, turn that piece white
-            if(index != -1) {
-                pieces[1][index].getPiece().setFill(Color.WHITE);
-                pieces[1][index].setClicked(false);
+            // If a piece is already clicked, turn that piece white and make it unclicked
+            if(firstClick) {
+                pieces[1][clickedPiece].getPiece().setFill(Color.WHITE);
+                pieces[1][clickedPiece].setClicked(false);
             }
+            // Set up the newly clicked piece
+            piece.setClicked(true);
+            this.clickedPiece = findClickedPiece();
+            this.firstClick = true;
             piece.getPiece().setFill(Color.YELLOW);
             piece.setClicked(true);
-            // setCoordinates(mouseEvent.getX(), mouseEvent.getY());
         });
     }
 
@@ -72,17 +92,27 @@ public class Board {
         return -1;
     }
 
-    public void addListener(GameSquare square) {
+    public void addListener(Rectangle square,Pane pane) {
         // Take action when a piece is clicked
-        square.getSquare().setOnMouseClicked(mouseEvent -> {
-            square.getSquare().setFill(Color.BLUE);
-            int movedPiece = findClickedPiece();
-            movePiece(pieces[1][movedPiece],square.getSquare().getX() + squareMargin,square.getSquare().getY() + squareMargin);
+        square.setOnMouseClicked(mouseEvent -> {
+            // Only move a clicked piece if the move is valid
+            if(this.clickedPiece != -1 && this.firstClick && this.isValidMove()) {
+                this.firstClick = false;
+                // Move the clicked piece to a new square
+                Polygon target = pieces[1][clickedPiece].getPiece();
+                movePiece(target,square.getY(),square.getX());
+            }
         });
     }
 
-    private void movePiece(GamePiece piece, double x, double y) {
-        piece.setCoordinates(x,y);
+    // Move the piece that is selected
+    private void movePiece(Polygon target, double x, double y) {
+        double[] coor = {target.getPoints().get(0),target.getPoints().get(1)};
+        target.setTranslateX(x + 50 - squareMargin - coor[0]);
+        target.setTranslateY(y + (100 - squareMargin) - coor[1]);
+        // Reset the clicked piece to unclicked
+        pieces[1][clickedPiece].setClicked(false);
+        pieces[1][clickedPiece].getPiece().setFill(Color.WHITE);
     }
 
     private boolean isValidMove() {
