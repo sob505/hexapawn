@@ -40,7 +40,6 @@ public class Hexapawn extends Application {
         pane.getChildren().addAll(canvas,board,pieces);
         board.setTranslateX(100);
         board.setTranslateY(100);
-       // Pane pieces = gameBoard.makePieces();
 
         ChoiceBox cb = new ChoiceBox(FXCollections.observableArrayList(
                 "Slow Mode", "Fast Mode", "Auto Mode")
