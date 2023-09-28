@@ -36,7 +36,7 @@ public class Hexapawn extends Application {
 
         // Create the board and pieces
         GridPane board = gameBoard.makeBoard(pane);
-        Group pieces = gameBoard.makePieces(pane);
+        Group pieces = gameBoard.makePieces();
         pane.getChildren().addAll(canvas,board,pieces);
         board.setTranslateX(100);
         board.setTranslateY(100);

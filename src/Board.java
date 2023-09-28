@@ -19,6 +19,17 @@ public class Board {
     private Matchbox match;// = new Matchbox(this.getLocations(),numRows);
     private int[] numPieces = {3,3};
 
+    Group arrows = new Group();
+    private final double[] arrowPoints = new double[]{
+            -5.0, 20.0,
+             5.0, 20.0,
+             5.0, -10.0,
+             15.0, -10.0,
+              0.0, -30.0,
+            -15.0, -10.0,
+            -5.0, -10.0
+    };
+
     public GridPane makeBoard(Pane pane) {
         int startx = 100;
         int starty = 100;
@@ -46,7 +57,7 @@ public class Board {
     /*
         Create 6 pieces on the board: 3 for HER and 3 for the human player.
      */
-    public Group makePieces(Pane pane) {
+    public Group makePieces() {
         Group groupPieces = new Group();
         double humanCoordinate = 125.0;
 
@@ -118,7 +129,8 @@ public class Board {
                 pieceLocation[clickedPieceLoc[0]][clickedPieceLoc[1]] = 0;
                 int[] newLoc = gameSquare.getIndex();
                 pieceLocation[newLoc[0]][newLoc[1]] = this.clickedPiece;
-                makeMove();
+
+                makeMove(pane); // It's HER turn
             }
         });
     }
@@ -131,7 +143,47 @@ public class Board {
         // Reset the clicked piece to unclicked
         pieces[1][clickedPiece-4].setClicked(false);
         pieces[1][clickedPiece-4].getPiece().setFill(Color.WHITE);
-        //this.clickedPiece = -1;
+    }
+
+    private void makeArrows() {
+        this.arrows = new Group();
+        boolean[][] moves = match.getMoves();
+        for(int i = 0; i < moves.length; i++) {
+            for(int j = 0; j < moves[i].length; j++) {
+                Polygon target = this.pieces[0][i].getPiece();
+                if (moves[i][j]) {
+                    // Determine the angle depending on which type of move
+                    int angle;
+                    int offset;
+                    Color color;
+                    switch (j) {
+                        case 0: // Diagonal left
+                            angle = -135;
+                            offset = -50;
+                            color = Color.BLUE;
+                            break;
+                        case 2: // Diagonal right
+                            angle = 135;
+                            offset = 50;
+                            color = Color.GREEN;
+                            break;
+                        default: // Down
+                            angle = 180;
+                            offset = 0;
+                            color = Color.RED;
+                    };
+                    
+                    Polygon arrow = new Polygon(arrowPoints);
+                    arrow.setRotate(angle);
+                    arrow.setTranslateX(target.getPoints().get(4)-25+offset);
+                    arrow.setTranslateY(target.getPoints().get(3)+35);
+                    //arrow.setStroke(color);
+                    //arrow.setStrokeWidth(3.0);
+                    arrow.setFill(color);
+                    this.arrows.getChildren().add(arrow);
+                }
+            }
+        }
     }
 
     private boolean isValidMove() {
@@ -142,7 +194,14 @@ public class Board {
         return pieceLocation;
     }
 
-    private void makeMove() {
+    private void makeMove(Pane pane) {
+        pane.getChildren().remove(this.arrows);
         match.updateMatchbox(this.getLocations(),numPieces[0]);
+        makeArrows();
+        pane.getChildren().addAll(this.arrows);
+
+        // Move a HER piece at random
+
+
     }
 }

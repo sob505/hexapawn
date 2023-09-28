@@ -2,6 +2,11 @@
     The Matchbox class keeps track of all the potential moves and probabilities of those moves.
 */
 
+import javafx.scene.Group;
+import javafx.scene.shape.Polygon;
+
+import java.util.List;
+
 public class Matchbox {
     private double[][] probability;
     private final boolean[][] moves;
@@ -82,6 +87,9 @@ public class Matchbox {
         }
     }
 
+    public boolean[][] getMoves() { return this.moves; }
+    public int getMoveCnt() { return this.moveCnt; }
+    public double[][] getProbability() { return probability; }
     /*
             Example board:
             1 2 3
