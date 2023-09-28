@@ -1,5 +1,10 @@
 import javafx.animation.PauseTransition;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -7,6 +12,8 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.util.List;
 
 public class Board {
@@ -20,6 +27,8 @@ public class Board {
     private boolean firstClick = false;
     private Matchbox match;// = new Matchbox(this.getLocations(),numRows);
     private int[] numPieces = {3,3};
+    private Number gameMode;
+    private Number numRounds;
 
     Group arrows = new Group();
     private final double[] arrowPoints = new double[]{
@@ -79,6 +88,23 @@ public class Board {
         return groupPieces;
     }
 
+    public void addListener(ChoiceBox cb) {
+        cb.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue ov, Number value, Number newValue) {
+                gameMode = newValue; }
+        }
+        );
+    }
+
+    public void addListener(Slider slider) {
+        slider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                numRounds = newValue;
+            }
+        });
+    }
+
     /*
         Create a listener for each piece where only one piece can be clicked at a time
      */
@@ -132,11 +158,15 @@ public class Board {
                 int[] newLoc = gameSquare.getIndex();
                 pieceLocation[newLoc[0]][newLoc[1]] = this.clickedPiece;
 
-                showMoves(pane); // Show the moves for HER
-                PauseTransition pause = new PauseTransition(Duration.seconds(1));
-                pause.play();
-                pause.setOnFinished(event ->
-                        makeMove(pane)); // It's HER turn
+                if(gameMode != null && gameMode.intValue() == 0) {
+                    showMoves(pane); // Show the moves for HER
+                    PauseTransition pause = new PauseTransition(Duration.seconds(1));
+                    pause.play();
+                    pause.setOnFinished(event ->
+                            makeMove(pane)); // It's HER turn
+                } else {
+                    makeMove(pane);
+                }
             }
         });
     }
@@ -206,6 +236,7 @@ public class Board {
         return pieceLocation;
     }
 
+    // Display arrows indicating all of HER potential moves
     private void showMoves(Pane pane) {
         pane.getChildren().remove(this.arrows);
         match.updateMatchbox(this.getLocations(),numPieces[0]);
