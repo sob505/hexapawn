@@ -1,9 +1,11 @@
+import javafx.animation.PauseTransition;
 import javafx.scene.Group;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -39,6 +41,7 @@ public class Board {
                 GameSquare square = new GameSquare(startx,starty,new int[]{j,i});
                 square.getSquare().setFill(Color.WHITE);
                 square.getSquare().setStroke(Color.BLACK);
+                this.board[i][j] = square;
                 gridPane.add(square.getSquare(),i,j);
                 if(startx == 300) { // Only handles 3x3 board currently
                     startx = 100;
@@ -123,26 +126,35 @@ public class Board {
             if(this.clickedPiece != -1 && this.firstClick && this.isValidMove()) {
                 this.firstClick = false;
                 // Move the clicked piece to a new square
-                Polygon target = pieces[1][this.clickedPiece-4].getPiece();
-                movePiece(target,square.getY(),square.getX());
+                movePiece(pieces[1][this.clickedPiece-4],square.getY(),square.getX());
                 int[] clickedPieceLoc = findClickedPieceLoc(this.clickedPiece);
                 pieceLocation[clickedPieceLoc[0]][clickedPieceLoc[1]] = 0;
                 int[] newLoc = gameSquare.getIndex();
                 pieceLocation[newLoc[0]][newLoc[1]] = this.clickedPiece;
 
-                makeMove(pane); // It's HER turn
+                showMoves(pane); // Show the moves for HER
+                PauseTransition pause = new PauseTransition(Duration.seconds(1));
+                pause.play();
+                pause.setOnFinished(event ->
+                        makeMove(pane)); // It's HER turn
             }
         });
     }
 
     // Move the piece that is selected
-    private void movePiece(Polygon target, double x, double y) {
+    private void movePiece(GamePiece piece, double x, double y) {
+        Polygon target = piece.getPiece();
+        int offset = 50;
+
+        if(piece.getPlayer().equals("Human")) {
+            offset = 100;
+            // Reset the clicked piece to unclicked
+            piece.setClicked(false);
+            target.setFill(Color.WHITE);
+        }
         double[] coor = {target.getPoints().get(0),target.getPoints().get(1)};
         target.setTranslateX(x + 50 - squareMargin - coor[0]);
-        target.setTranslateY(y + (100 - squareMargin) - coor[1]);
-        // Reset the clicked piece to unclicked
-        pieces[1][clickedPiece-4].setClicked(false);
-        pieces[1][clickedPiece-4].getPiece().setFill(Color.WHITE);
+        target.setTranslateY(y + (offset - squareMargin) - coor[1]);
     }
 
     private void makeArrows() {
@@ -194,14 +206,23 @@ public class Board {
         return pieceLocation;
     }
 
-    private void makeMove(Pane pane) {
+    private void showMoves(Pane pane) {
         pane.getChildren().remove(this.arrows);
         match.updateMatchbox(this.getLocations(),numPieces[0]);
         makeArrows();
         pane.getChildren().addAll(this.arrows);
+    }
+    private void makeMove(Pane pane) {
+        // Choose a move at weighted random
+        int random = (int) (Math.random() * 100);
+        int move = match.getProbability().get(random);
+        int[] moveLoc = new int[]{move/3,move%3};
+        GamePiece pieceToMove = this.pieces[0][moveLoc[0]];
 
-        // Move a HER piece at random
-
-
+        // Move the corresponding piece
+        //pieceToMove.getPiece().setFill(Color.PINK);
+        movePiece(pieceToMove,this.board[moveLoc[0]][moveLoc[1]].getSquare().getY(),
+                this.board[moveLoc[0]][moveLoc[1]].getSquare().getX());
+        pane.getChildren().remove(this.arrows);
     }
 }

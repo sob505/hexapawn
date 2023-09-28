@@ -5,22 +5,23 @@
 import javafx.scene.Group;
 import javafx.scene.shape.Polygon;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class Matchbox {
-    private double[][] probability;
+    private ArrayList<Integer> probability;
     private final boolean[][] moves;
     private int moveCnt = 0;
     private String result;
 
     public Matchbox(int[][] board, int numPieces) {
         this.moves = new boolean[numPieces][numPieces];
-        this.probability = new double[numPieces][numPieces];
+        this.probability = new ArrayList<Integer>();
 
         for(int i = 1; i <= numPieces; i++) {
             int[] location = findLoc(i,board);
             checkMoves(i-1,location,board,"HER");
         }
+        countMoves();
         calcProbability();
     }
 
@@ -58,7 +59,6 @@ public class Matchbox {
                 moves[index][2] = (location[1] < board.length - 1 && board[location[0] - 1][location[1] + 1] != 0);
             }
         }
-        countMoves();
     }
 
     private void countMoves() {
@@ -73,8 +73,12 @@ public class Matchbox {
     private void calcProbability() {
         for(int i = 0; i < moves.length; i++) {
             for(int j = 0; j < moves[i].length; j++) {
-                if(moves[i][j]) { probability[i][j] = (double) 1 / moveCnt; }
-                else { probability[i][j] = 0; }
+                if(moves[i][j]) {
+                    int repeat = (int) (((double) 1 / moveCnt) * 100);
+                    for(int k = 0; k < repeat; k++) {
+                        this.probability.add((i * 3) + j);//((double) 1 / moveCnt) * 100;
+                    }
+                }
             }
         }
     }
@@ -89,7 +93,8 @@ public class Matchbox {
 
     public boolean[][] getMoves() { return this.moves; }
     public int getMoveCnt() { return this.moveCnt; }
-    public double[][] getProbability() { return probability; }
+    public ArrayList<Integer> getProbability() { return probability; }
+
     /*
             Example board:
             1 2 3
@@ -100,5 +105,10 @@ public class Matchbox {
             row 1: 0, 1, 0 // moves for piece 1
             row 2: 0, 1, 1 // moves for piece 2
             row 3: 0, 0, 0 // moves for piece 3
+
+            Example probability:
+            0.0 0.3 0.0
+            0.0 0.3 0.3
+            0.0 0.0 0.0
      */
 }

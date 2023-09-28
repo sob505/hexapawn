@@ -21,17 +21,17 @@ public class GamePiece {
     }
 
     private void resetCoordinates() {
-        if(this.player.equals("Human")) {
+        if(this.player.equals("HER")) {
             this.coordinates = new Double[]{
-                    0.0, 50.0,  // Left
-                    25.0, 0.0,  // Top
-                    50.0, 50.0, // Right
-            };
-        } else {
-            this.coordinates = new Double[] {
                     0.0,0.0,
                     25.0,50.0,
                     50.0,0.0,
+            };
+        } else {
+            this.coordinates = new Double[] {
+                    0.0, 50.0,  // Left
+                    25.0, 0.0,  // Top
+                    50.0, 50.0, // Right
             };
         }
     }
@@ -65,4 +65,5 @@ public class GamePiece {
     public void setClicked(boolean value) {
         this.clicked = value;
     }
+    public String getPlayer() { return this.player; }
 }
