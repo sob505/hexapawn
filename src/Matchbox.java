@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 public class Matchbox {
     private ArrayList<Integer> probability;
+    private double[] singleProbability;
     private final boolean[][] moves;
     private int moveCnt = 0;
     private String result;
@@ -71,10 +72,13 @@ public class Matchbox {
     }
 
     private void calcProbability() {
+        this.singleProbability = new double[moveCnt];
+        int probabilityCnt = 0;
         for(int i = 0; i < moves.length; i++) {
             for(int j = 0; j < moves[i].length; j++) {
                 if(moves[i][j]) {
                     int repeat = (int) (((double) 1 / moveCnt) * 100);
+                    this.singleProbability[probabilityCnt] = repeat;
                     for(int k = 0; k < repeat; k++) {
                         this.probability.add((i * 3) + j);//((double) 1 / moveCnt) * 100;
                     }
@@ -93,7 +97,8 @@ public class Matchbox {
 
     public boolean[][] getMoves() { return this.moves; }
     public int getMoveCnt() { return this.moveCnt; }
-    public ArrayList<Integer> getProbability() { return probability; }
+    public ArrayList<Integer> getProbability() { return this.probability; }
+    public double[] getSingleProbability() { return this.singleProbability; }
 
     /*
             Example board:

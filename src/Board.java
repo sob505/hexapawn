@@ -3,10 +3,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
@@ -29,6 +31,7 @@ public class Board {
     private int[] numPieces = {3,3};
     private Number gameMode;
     private Number numRounds;
+    private StackPane stack;
 
     Group arrows = new Group();
     private final double[] arrowPoints = new double[]{
@@ -189,6 +192,7 @@ public class Board {
 
     private void makeArrows() {
         this.arrows = new Group();
+        int probabilityCnt = 0;
         boolean[][] moves = match.getMoves();
         for(int i = 0; i < moves.length; i++) {
             for(int j = 0; j < moves[i].length; j++) {
@@ -222,7 +226,14 @@ public class Board {
                     //arrow.setStroke(color);
                     //arrow.setStrokeWidth(3.0);
                     arrow.setFill(color);
-                    this.arrows.getChildren().add(arrow);
+
+                    double probability = match.getSingleProbability()[probabilityCnt];
+                    Label label = new Label(String.valueOf(probability));
+                    label.setTranslateX(arrow.getTranslateX()+10);
+                    label.setTranslateY(arrow.getTranslateY()+10);
+                    label.setStyle("-fx-font-size: 20");
+                    label.setStyle("-fx-font-weight: bold");
+                    this.arrows.getChildren().addAll(new StackPane(arrow,label));
                 }
             }
         }
