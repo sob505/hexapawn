@@ -2,7 +2,11 @@
         Hexapawn
         Sachi Barnaby
 
-        This class implements the Hexapawn game.
+        This class implements the Hexapawn game. Run this class to start the game.
+        In Fast Mode, you can click the white pieces and then a square to move them (if that is a valid move).
+        Keep playing until one side wins. Restart the game by pressing the button.
+        In Slow Mode, make your move and then either click an arrow or press the "Random Move" button for HER to make
+        its move. Repeat until one side wins. Restart in the same way.
 
  */
 
@@ -26,7 +30,6 @@ import javafx.application.Application;
 public class Hexapawn extends Application {
     private final Canvas canvas = new Canvas(800,500);
     private final GraphicsContext gc = canvas.getGraphicsContext2D();
-    private Board gameBoard = new Board();
     private static Pane pane = new Pane();
 
     public static void main(String[] args) {
@@ -37,24 +40,28 @@ public class Hexapawn extends Application {
         stage.setTitle("Game Board");
 
         // Create the board and pieces
-        GridPane board = gameBoard.makeBoard(pane);
-        Group pieces = gameBoard.makePieces();
-        pane.getChildren().addAll(canvas,board,pieces);
-        board.setTranslateX(100);
-        board.setTranslateY(100);
+        Board gameBoard = new Board(pane);
+        GridPane grid = gameBoard.getGridPane();
+        Group pieces = gameBoard.getGroupPieces();
+        pane.getChildren().addAll(canvas,grid,pieces);
+        grid.setTranslateX(100);
+        grid.setTranslateY(100);
 
         ChoiceBox cb = new ChoiceBox(FXCollections.observableArrayList(
                 "Slow Mode", "Fast Mode", "Auto Mode")
         );
+        cb.setValue("Fast Mode");
         cb.setTranslateX(100);
         cb.setTranslateY(-100);
         gameBoard.addListener(cb);
 
         Slider slider = new Slider(0.0,20.0,1.0);
+        slider.setValue(1.0);
         slider.setPrefWidth(200);
         slider.setMaxWidth(200);
         slider.setTranslateX(150);
         slider.setTranslateY(-50);
+        slider.setShowTickLabels(true);
         gameBoard.addListener(slider);
 
         Label label = new Label("Number of Rounds");

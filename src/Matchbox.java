@@ -5,30 +5,46 @@
 import javafx.scene.Group;
 import javafx.scene.shape.Polygon;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Matchbox {
     private ArrayList<Integer> probability;
     private double[] singleProbability;
     private final boolean[][] moves;
     private int moveCnt = 0;
-    private String result;
+    private int[][] board;
+    private final ArrayList<int[][]> matchboxes = new ArrayList<>();
+    private final ArrayList<int[]> punishedMoves = new ArrayList<>();
+    public Matchbox(int numPieces) {
+        this.moves = new boolean[numPieces][numPieces];
+        this.probability = new ArrayList<Integer>();
+    }
 
-    public Matchbox(int[][] board, int numPieces) {
+    public Matchbox(int[][] board, int numPieces,String player) {
+        this.board = board;
         this.moves = new boolean[numPieces][numPieces];
         this.probability = new ArrayList<Integer>();
 
-        for(int i = 1; i <= numPieces; i++) {
-            int[] location = findLoc(i,board);
-            checkMoves(i-1,location,board,"HER");
+        if(player.equals("HER")) {
+            for (int i = 1; i <= numPieces; i++) {
+                int[] location = findLoc(i);
+                checkMoves(i - 1, location, "HER");
+            }
+        } else {
+            for (int i = 4; i <= 3+numPieces; i++) {
+                int[] location = findLoc(i);
+                checkMoves(i - 4, location, "Human");
+            }
         }
         countMoves();
         calcProbability();
     }
 
-    private int[] findLoc(int pieceNum,int[][] board) {
-        for(int i = 0; i < board.length; i++) {
-            for(int j = 0; j < board[i].length; j++) {
+    private int[] findLoc(int pieceNum) {
+        for(int i = 0; i < this.board.length; i++) {
+            for(int j = 0; j < this.board[i].length; j++) {
                 if(board[i][j] == pieceNum) {
                     return new int[]{i,j};
                 }
@@ -37,47 +53,50 @@ public class Matchbox {
         return new int[]{-1,-1};
     }
 
-    private void checkMoves(int index, int[] location, int[][] board, String player) {
+    private void checkMoves(int index, int[] location, String player) {
+        // If a piece is missing, make the whole row of moves false
+        if(location[0] < 0) {
+            Arrays.fill(moves[index], false);
+            return;
+        }
         if(player.equals("HER")) { // HER pieces can only move downwards
-            // If a piece has reached the bottom of the board, HER wins
-            if(location[0] == board.length) { this.result = "HER Wins"; }
-            else {
-                // Check if the piece can move diagonally left
-                moves[index][0] = (location[1] > 0 && board[location[0] + 1][location[1] - 1] != 0);
-                // Check if the piece can move forward
-                moves[index][1] = (board[location[0] + 1][location[1]] == 0);
-                // Check if the piece can move diagonally right
-                moves[index][2] = (location[1] < board.length - 1 && board[location[0] + 1][location[1] + 1] != 0);
-            }
+            // Check if the piece can move diagonally left
+            moves[index][0] = (location[1] > 0 && this.board[location[0] + 1][location[1] - 1] > 3);
+            // Check if the piece can move forward
+            moves[index][1] = (this.board[location[0] + 1][location[1]] == 0);
+            // Check if the piece can move diagonally right
+            moves[index][2] = (location[1] < this.board.length - 1 && this.board[location[0] + 1][location[1] + 1] > 3);
         } else { // Human pieces move upwards
-            // If a piece has reached the top of the board, Human wins
-            if(location[0] == 0) { this.result = "Human Wins"; }
-            else {// Check if the piece can move diagonally left
-                moves[index][0] = (location[1] > 0 && board[location[0] + 1][location[1] + 1] != 0);
-                // Check if the piece can move forward
-                moves[index][1] = (board[location[0] - 1][location[1]] == 0);
-                // Check if the piece can move diagonally right
-                moves[index][2] = (location[1] < board.length - 1 && board[location[0] - 1][location[1] + 1] != 0);
-            }
+            // Check if the piece can move diagonally left
+            moves[index][0] = (location[1] > 0 && this.board[location[0] - 1][location[1] - 1] != 0
+                    && this.board[location[0] - 1][location[1] - 1] < 4);
+            // Check if the piece can move forward
+            moves[index][1] = (this.board[location[0] - 1][location[1]] == 0);
+            // Check if the piece can move diagonally right
+            moves[index][2] = (location[1] < this.board.length - 1 && this.board[location[0] - 1][location[1] + 1] != 0
+                    && this.board[location[0] - 1][location[1] + 1] < 4);
         }
     }
 
+
     private void countMoves() {
+        this.moveCnt = 0;
         for(int i = 0; i < moves.length; i++) {
             for(int j = 0; j < moves[i].length; j++) {
-                if(moves[i][j]) { moveCnt++; }
+                if(moves[i][j]) { this.moveCnt++; }
             }
         }
-        if(moveCnt == 0) { this.result = "Human Wins"; }
+       // if(moveCnt == 0) { this.result = "Human Wins"; }
     }
 
     private void calcProbability() {
+        this.probability = new ArrayList<Integer>();
         this.singleProbability = new double[moveCnt];
         int probabilityCnt = 0;
-        for(int i = 0; i < moves.length; i++) {
-            for(int j = 0; j < moves[i].length; j++) {
-                if(moves[i][j]) {
-                    int repeat = (int) (((double) 1 / moveCnt) * 100);
+        for(int i = 0; i < this.moves.length; i++) {
+            for(int j = 0; j < this.moves[i].length; j++) {
+                if(this.moves[i][j]) {
+                    int repeat = (int) (((double) 1 / this.moveCnt) * 100);
                     this.singleProbability[probabilityCnt] = repeat;
                     for(int k = 0; k < repeat; k++) {
                         this.probability.add((i * 3) + j);//((double) 1 / moveCnt) * 100;
@@ -87,12 +106,53 @@ public class Matchbox {
         }
     }
 
-    public void updateMatchbox(int[][] board, int numPieces) {
-        for(int i = 1; i <= numPieces; i++) {
-            int[] location = findLoc(i,board);
-            checkMoves(i-1,location,board,"HER");
-            calcProbability();
+    public void updateMatchbox(int[][] board, int numPieces, String player) {
+        this.board = board;
+        if(player.equals("HER")) {
+            for (int i = 1; i <= numPieces; i++) {
+                int[] location = findLoc(i);
+                checkMoves(i - 1, location, "HER");
+            }
+            removeMatches(matchboxes,punishedMoves);
+        } else {
+            for (int i = 4; i <= 3+numPieces; i++) {
+                int[] location = findLoc(i);
+                checkMoves(i - 4, location, "Human");
+            }
         }
+        countMoves();
+        calcProbability();
+    }
+
+    private void removeMatches(ArrayList<int[][]> matchboxes, ArrayList<int[]> lastMoves) {
+        for(int i = 0; i < matchboxes.size(); i++) {
+            if (Arrays.deepEquals(matchboxes.get(i), this.board)) {
+                this.moves[lastMoves.get(i)[0]][lastMoves.get(i)[1]] = false;
+            }
+        }
+    }
+
+    public void punish(int[] lastMove,int[][] lastPosition) {
+        this.punishedMoves.add(copy(lastMove));
+        this.matchboxes.add(copy(lastPosition));
+    }
+
+    public static int[][] copy(int[][] original) {
+        int[][] temp = new int[original.length][original[0].length];
+        for(int i = 0; i < original.length; i++) {
+            for(int j = 0; j < original[i].length; j++) {
+                temp[i][j] = original[i][j];
+            }
+        }
+        return temp;
+    }
+
+    public static int[] copy(int[] original) {
+        int[] temp = new int[original.length];
+        for(int i = 0; i < original.length; i++) {
+            temp[i] = original[i];
+        }
+        return temp;
     }
 
     public boolean[][] getMoves() { return this.moves; }
