@@ -44,6 +44,7 @@ public class Board {
     private int[] lastMove;
     private Polygon[] arrowList;
     Group arrows = new Group();
+    private boolean keepMemory = false;
     private final double[] arrowPoints = new double[]{
             -5.0, 20.0,
              5.0, 20.0,
@@ -55,10 +56,11 @@ public class Board {
     };
     private Polygon arrow;
 
-    public Board(Pane pane) {
+    public Board(Pane pane, Number num) {
         this.makeBoard(pane);
         this.makePieces();
         showWins();
+        this.gameMode = num;
     }
 
     public void makeBoard(Pane pane) {
@@ -115,8 +117,10 @@ public class Board {
             pieceLocation[numRows-1][i] = i+4; // Initialize locations for Human pieces
             this.groupPieces.getChildren().addAll(pieces[0][i].getPiece(),pieces[1][i].getPiece());
         }
-        this.HERMatch = new Matchbox(numPieces[0]);
-        this.humanMatch = new Matchbox(this.pieceLocation,numPieces[1],"Human");
+        if(!keepMemory) {
+            this.HERMatch = new Matchbox(numPieces[0]);
+            this.humanMatch = new Matchbox(this.pieceLocation, numPieces[1], "Human");
+        }
     }
 
     public void addListener(ChoiceBox cb) {
@@ -217,7 +221,7 @@ public class Board {
                 movePiece(this.clickedPiece, square.getX(), square.getY(), gameSquare.getIndex());
                 checkWins();
                 if (this.endGame == null && this.playerTurn.equals("HER")) {
-                    HERMatch.updateMatchbox(this.getLocations(), HER.getNumPieces(),"HER");
+                    this.HERMatch.updateMatchbox(this.getLocations(), HER.getNumPieces(),"HER");
                     checkMoveCnt();
 
                     // For Slow mode, show the matchbox and let the user choose a move or random one
@@ -323,6 +327,7 @@ public class Board {
                 resetBoard();
                 this.pane.getChildren().removeAll(text);
                 this.endGame = null;
+                this.roundCnt++;
                 return;
             }
         }
@@ -341,11 +346,14 @@ public class Board {
     }
 
     private void resetBoard() {
+        this.keepMemory = true;
         this.groupPieces.getChildren().clear();
         makePieces();
         this.firstClick = false;
         this.human.resetPlayer();
         this.HER.resetPlayer();
+        this.humanMatch.updateMatchbox(this.getLocations(),human.getNumPieces(),"Human");
+        this.HERMatch.updateMatchbox(this.getLocations(),HER.getNumPieces(),"HER");
         this.pane.getChildren().add(this.groupPieces);
     }
 

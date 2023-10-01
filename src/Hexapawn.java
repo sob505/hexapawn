@@ -40,7 +40,7 @@ public class Hexapawn extends Application {
         stage.setTitle("Game Board");
 
         // Create the board and pieces
-        Board gameBoard = new Board(pane);
+        Board gameBoard = new Board(pane, 1);
         GridPane grid = gameBoard.getGridPane();
         Group pieces = gameBoard.getGroupPieces();
         pane.getChildren().addAll(canvas,grid,pieces);

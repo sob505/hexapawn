@@ -113,13 +113,14 @@ public class Matchbox {
                 int[] location = findLoc(i);
                 checkMoves(i - 1, location, "HER");
             }
-            removeMatches(matchboxes,punishedMoves);
         } else {
             for (int i = 4; i <= 3+numPieces; i++) {
                 int[] location = findLoc(i);
                 checkMoves(i - 4, location, "Human");
             }
         }
+
+        removeMatches(this.matchboxes,this.punishedMoves);
         countMoves();
         calcProbability();
     }
